@@ -35,6 +35,7 @@ router.post("/createBook", BookController.createBook  )
 //     }
 // }
 
+
 // // e.g. restricted and open-to-all API's can be handled like below now:
 // router.get('/homePage', mid1, UserController.feeds)
 // router.get('/profileDetails', mid1, UserController.profileDetails)
@@ -48,7 +49,7 @@ router.post("/createBook", BookController.createBook  )
 
 
 
-router.get("/basicRoute", commonMW.mid1, commonMW.mid2, commonMW.mid3, commonMW.mid4, UserController.basicCode)
+router.get("/basicRoute", commonMW.mid1, commonMW.mid2, commonMW.mid3, commonMW.mid4, commonMW.requestTime, UserController.basicCode)
 
 
 
