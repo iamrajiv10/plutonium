@@ -16,7 +16,7 @@ const createBlog = async function (req, res) {
     const { body,title,category,tags,subcategory} = blog
 
 
-     if(body === "undifined" || body==null || typeof(title)!='string') return res.status(404).send("Body is required")
+     if(body === "undifined" || body==null || typeof(body)!='string') return res.status(404).send("Body is required")
      if(title === "undifined" || title==null || typeof(title)!='string') return res.status(404).send("Title is required")
      if(category === "undifined" || category==null) return res.status(404).send("Category is required")
 
