@@ -12,7 +12,6 @@ function isEnum(value) {
 }
 
 
-
 // =================user validation===========================================
 const  userValidation = async function(req,res,next){
     try{
@@ -53,11 +52,11 @@ const  userValidation = async function(req,res,next){
     
     if(address)
     {
-    // if(!address.street){return res.status(400).send({status:false,message:"Please provide the street"})}
-    // if(typeof address.street==='String' && address.street.trim().length === 0){return res.status(400).send({status:false,message:"street is empty"})}
-    // if(typeof address.street !== 'string') {return res.status(400).send({status:false,message:"street should be string"})}
-    // if (!(("^(\\d{1,}) [a-zA-Z0-9\\s]+(\\,)? [a-zA-Z]+(\\,)? [A-Z]{2} [0-9]{5,6}$")
-    // ).test(address.street.trim())) { return res.status(400).send({ status: false, message: "Please provide valid street" }) }
+    if(!address.street){return res.status(400).send({status:false,message:"Please provide the street"})}
+    if(typeof address.street==='String' && address.street.trim().length === 0){return res.status(400).send({status:false,message:"street is empty"})}
+    if(typeof address.street !== 'string') {return res.status(400).send({status:false,message:"street should be string"})}
+    // if (!(/^[a-zA-Z0-9-]*[a-zA-Z0-9]+(?:, [a-zA-Z0-9-]*[a-zA-Z0-9]+)*$/).test(address.street.trim())) 
+    // { return res.status(400).send({ status: false, message: "Please provide valid street" }) }
 
     if(!address.city){return res.status(400).send({status:false,message:"Please provide the city"})}
     if(typeof address.city==='string' && address.city.trim().length === 0){return res.status(400).send({status:false,message:"city is empty"})}
