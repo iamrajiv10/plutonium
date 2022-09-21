@@ -1,5 +1,6 @@
-const userModel = require("../Model/userModel")
+const userModel = require('../Model/userModel')
 const jwt = require('jsonwebtoken')
+const moment = require('moment')
 
 
 
@@ -32,12 +33,18 @@ const login = async function (req, res) {
         const user = await userModel.findOne(requestBody)
         if (!user) return res.status(400).send({ status: false, message: "Invalid Credentials!!" })
 
-
+        let expiration = '7d'
         let token = jwt.sign({
             userId: user._id.toString(),
             topic: "BooksManagement"
-        }, 'project-3-group-61',{ expiresIn: '1h' });
-        res.status(200).send({ status: true, message: "Success", data: token })
+        }, 'project-3-group-61',{ expiresIn: expiration });
+        let tokenData = {
+            token : token,
+            userId: user._id,
+            iat: moment(),
+            exp: expiration
+        }
+        res.status(200).send({ status: true, message: "Success", data: tokenData })
 
     }
     catch (err) {
