@@ -6,7 +6,7 @@ const validation = require("../vallidation/validation")
 
 router.post("/register", validation.userValidation, userController.createUser)
 router.post("/login", userController.login)
-//router.post("/books",bookController.creatbook)
+router.post("/books",bookController.createBook)
 
 
 module.exports = router;
