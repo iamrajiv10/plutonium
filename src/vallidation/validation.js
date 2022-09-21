@@ -1,5 +1,7 @@
 const userModel = require("../Model/userModel")
 
+
+
 const isValid = function (value) {
     if (typeof value == "undefined" || value == null) return false;
     if (typeof value == "string" && value.trim().length > 0) return true;
@@ -23,6 +25,9 @@ const isNameValid = function (value) {
     let regex = /^[a-zA-Z]+([\s][a-zA-Z]+)*$/
     return regex.test(value)
 }
+
+
+
 
 
 
@@ -139,22 +144,3 @@ const  userValidation = async function(req,res,next){
 
 }
 module.exports.userValidation = userValidation
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

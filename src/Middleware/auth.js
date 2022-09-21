@@ -1,11 +1,11 @@
 const jwt = require("jsonwebtoken")
-const BookModel = require("../models/bookModel");
+const BookModel = require("../Model/bookModel");
 
 //************************************AUTHENTICATION*********************** */
 
 
 const authentication = async function (req, res, next) {
-    const token = req.header["x-api-key"];
+    const token = req.headers["x-api-key"];
     const secretKey = "project-3-group-61";
 
     if (!token) {
