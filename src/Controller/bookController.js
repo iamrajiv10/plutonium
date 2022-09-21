@@ -47,7 +47,7 @@ const createBook = async function (req, res) {
     if (!isValidRequestBody(requestBody)) {
       return res
         .status(400)
-        .send({ status: false, message: "Book data is required to create a new user" });
+        .send({ status: false, message: "Book data is required to create a new Book" });
     }
 
     // using destructuring then validate the keys
