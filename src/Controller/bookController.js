@@ -215,13 +215,13 @@ const getBooksById = async function (req, res) {
     try {
 
         let bookId = req.params.bookId
-        if(!bookId) {return res.status(400).send({ status: false, message: "please give bookId" })}
+        if(!isValidIdType(bookId)) {return res.status(400).send({ status: false, message: "please give valid bookId" })}
         let findBook = await BookModel.findOne({_id: bookId, isDeleted: false}).lean()
         if (!findBook) {return res.status(404).send({ status: false, message: "No book found" })}
             
         const reviewData = await reviewModel.find({ bookId:findBook._id, isDeleted: false }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
          findBook["reviewsData"] = reviewData
-      res.status(200).send({status:true,message:'Book list',data:findBook})
+      res.status(200).send({status:true, message:'Book list', data:findBook})
 
     }
     catch (error) {

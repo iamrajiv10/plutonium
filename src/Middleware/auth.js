@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken")
+const mongoose = require("mongoose")
 const BookModel = require("../Model/bookModel");
 
 //************************************AUTHENTICATION*********************** */
@@ -19,6 +20,7 @@ const authentication = async function (req, res, next) {
         const decodedToken = jwt.verify(token, secretKey, {
             ignoreExpiration: true
         });
+        
 
         //token  expiry validation 
         if (Date.now() > decodedToken.exp * 1000) {
@@ -28,6 +30,7 @@ const authentication = async function (req, res, next) {
                 .send({ status: false, message: "session expired, please login again" })
 
         }
+       
 
         req.decodedToken = decodedToken;
 

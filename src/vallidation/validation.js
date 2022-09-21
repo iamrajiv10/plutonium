@@ -118,7 +118,7 @@ const  userValidation = async function(req,res,next){
             if (!isValid(address.street)) {
                 return res
                     .status(400)
-                    .send({ status: false, message: "invalid city" })
+                    .send({ status: false, message: "invalid street" })
             }
 
             if (!isValid(address.city) || !isNameValid(address.city)) {
