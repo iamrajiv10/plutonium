@@ -115,7 +115,7 @@ const createBook = async function (req, res) {
     }
 
     // checking ISBN format
-    if (!/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/
+    if (!/^(?=(?:\D*\d){13}(?:(?:\D*\d){3})?$)[\d-]+$/
 .test(ISBN)) {
       return res
         .status(400)
@@ -141,18 +141,7 @@ const createBook = async function (req, res) {
         .send({ status: false, message: `category is required and should be in valid format` });
     }
 
-    // if subcategory is an array then validating each element
-    if (Array.isArray(subcategory)) {
-      for (let i = 0; i < subcategory.length; i++) {
-        element = subcategory[i];
-        if (!isValid(element)) {
-          return res
-            .status(400)
-            .send({ status: false, message: `subcategory is required and should be in valid format` });
-        }
-      }
-    }
-
+    
     // if subcategory is not an array then validating that
     if (!isValidSubcategory(subcategory)) {
       return res
@@ -182,7 +171,7 @@ const createBook = async function (req, res) {
 
     // adding validated keys from requestBody and adding default values of isDeleted, reviews and deletedAt
 
-    const bookData = {
+    /*const bookData = {
       title: title.trim(),
       excerpt: excerpt.trim(),
       userId: userId.trim(),
@@ -193,9 +182,9 @@ const createBook = async function (req, res) {
       isDeleted: false,
       reviews: 0,
       deletedAt: null,
-    };
+    }; */
 
-    const newBook = await BookModel.create(bookData);
+    const newBook = await BookModel.create(requestBody);
 
     res
       .status(201)
@@ -230,5 +219,24 @@ const getBooksById = async function (req, res) {
     }
 };
 
+
+//---------------------Delete:/ DeleteBookByParams---------------------------------------------------------------------//
+
+//====================== DELETE /books/:bookId ========================
+
+const deleteBookById = async function (req, res) {
+    try {
+      let bookId = req.params.bookId;
+      let deletedata = await BookModel.findByIdAndUpdate(
+        bookId,
+        { $set: { isDeleted: true, deletedAt: new Date() } },
+        { new: true }
+      );
+      res.status(200).send({ status: true, message: "SuccessFully Deleted" });
+    } catch (error) {
+      res.status(500).send({ status: false, message: error.message });
+    }
+  };
 module.exports.createBook = createBook;
 module.exports.getBooksById = getBooksById
+module.exports.deleteBookById = deleteBookById

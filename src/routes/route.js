@@ -9,6 +9,7 @@ router.post("/register", validation.userValidation, userController.createUser)
 router.post("/login", userController.login)
 router.post('/books', MiddleWare.authentication ,bookController.createBook )
 router.get("/books/:bookId",bookController.getBooksById)
+router.delete("/books/:bookId",MiddleWare.authentication, MiddleWare.authorization, bookController.deleteBookById)
 
 
 module.exports = router;
