@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken")
 const mongoose = require("mongoose")
 const BookModel = require("../Model/bookModel");
+const { default: mongoose } = require('mongoose');
 
 //************************************AUTHENTICATION*********************** */
 
