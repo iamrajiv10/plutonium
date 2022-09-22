@@ -196,7 +196,51 @@ const createBook = async function (req, res) {
 
   }
 };
-// ----------------------------------------------------- GET /books/:bookId ----------------------------------------------------
+
+//-----------------------------------------------------GET /books-------------------------------------------------------------
+
+const getBooks = async function (req, res) {
+    try {
+        let queryParams = req.query;
+        const requestBody = req.body;
+        let queryData = { isDeleted: false, ...queryParams}
+  
+        if(queryParams.userId)
+        {if (!isValidIdType(queryParams.userId)) {
+          return res
+            .status(400)
+            .send({ status: false, message: `enter a valid userId` });
+        }}
+    
+        if (isValidRequestBody(requestBody)) {
+          return res
+            .status(400)
+            .send({ status: false, message: "invalid request" });
+        }
+  
+        if (!isValidRequestBody(queryParams)) 
+        {
+          const books = await BookModel.find({isDeleted: false }).select({ title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 }).sort({ title: 1 })
+          if (Object.keys(books).length==0) {return res.status(404).send({ status: false, message: "No book found" })}
+          res.status(200).send({ status: true, message: "Books list", data: books });
+        }
+        else
+        {
+          
+          const books = await BookModel.find(queryData).select({ title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 }).sort({ title: 1 })
+            if (Object.keys(books).length==0) { return res.status(404).send({ status: false, message: "No book found" })}
+          res.status(200).send({ status: true, message: "Books list", data: books });
+         
+        }
+     
+    }
+     catch (error) {
+        res.status(500).send({ status: false, Error: error.message });
+    }
+  }
+
+
+// ----------------------------------------------------- GET /books/:bookId -------------------------------------------------------
 
 
 const getBooksById = async function (req, res) {
@@ -219,10 +263,71 @@ const getBooksById = async function (req, res) {
     }
 };
 
+//---------------------PUT /books/:bookId------------------------------------------------------------------------------//
+
+const updateBooks= async function (req,res){
+    try{
+     let requestBody=req.body
+      if(!requestBody)return res.status(400).send({status:false,message:"data is not given"})
+     let bookId = req.params.bookId
+      if(!bookId)return res.status(400).send({status:400,message:"bookid is not given by the user"})
+     
+      const decodedToken = req.decodedToken;
+  
+      let {title,excerpt,releasedAt,ISBN} = requestBody
+      const isTitleUnique = await BookModel.findOne({
+        title: title,
+        isDeleted: false
+      });
+      
+  
+      if (isTitleUnique) {
+        return res
+          .status(400)
+          .send({ status: false, message: `title already exist` });
+      }
+      if (ISBN) {
+      if (!isValid(ISBN)) {
+        return res
+          .status(400)
+          .send({ status: false, message: `ISBN is required` });
+      }
+  
+      // checking ISBN format
+      if (!/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/
+  .test(ISBN)) {
+        return res
+          .status(400)
+          .send({ status: false, message: `enter a valid ISBN of 13 digits` });
+      }
+  
+      const isUniqueISBN = await BookModel.findOne({
+        ISBN: ISBN,
+        isDeleted: false
+      });
+      if (isUniqueISBN) {
+        return res
+          .status(400)
+          .send({ status: false, message: "ISBN already exist" });
+      }
+    }
+  
+    
+      const bookUpdated = await BookModel.findOneAndUpdate({_id:bookId,isDeleted:false},{$set:{title:title,excerpt:excerpt,releasedAt:Date.now(),ISBN:ISBN}},{new:true})
+      if(!bookUpdated)return res.status(400).send({status:false,message:"books are already deleted"})
+      return res.status(200).send({status:true,data:bookUpdated})
+  
+     
+    }catch(err){
+      return res.status(500).send({status:false,message:err.message})
+    }
+  }
+
+
 
 //---------------------Delete:/ DeleteBookByParams---------------------------------------------------------------------//
 
-//====================== DELETE /books/:bookId ========================
+
 
 const deleteBookById = async function (req, res) {
     try {
@@ -238,5 +343,7 @@ const deleteBookById = async function (req, res) {
     }
   };
 module.exports.createBook = createBook;
+module.exports.getBooks = getBooks
 module.exports.getBooksById = getBooksById
 module.exports.deleteBookById = deleteBookById
+module.exports.updateBooks=updateBooks
