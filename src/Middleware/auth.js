@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken")
 const mongoose = require("mongoose")
 const BookModel = require("../Model/bookModel");
-const { default: mongoose } = require('mongoose');
 
 //************************************AUTHENTICATION*********************** */
 
@@ -64,8 +63,7 @@ const authorization = async function (req, res, next) {
 
         const bookByBookId = await BookModel.findOne({
             _id: bookId,
-            isDeleted: false,
-            deletedAt: null,
+            isDeleted: false
         });
 
         if (!bookByBookId) {

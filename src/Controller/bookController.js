@@ -23,7 +23,7 @@ const isValidIdType = function (objectId) {
 const isValidSubcategory = function (value) {
   if (typeof value == "undefined" || value == null) return false;
   if (typeof value == "string" && value.trim().length > 0) return true;
-  if (typeof value == "object" && Array.isArray(value) == true) return true;
+ // if (typeof value == "object" && Array.isArray(value) == true) return true;
 };
 
 
@@ -267,25 +267,46 @@ const getBooksById = async function (req, res) {
 
 const updateBooks= async function (req,res){
     try{
-     let requestBody=req.body
-      if(!requestBody)return res.status(400).send({status:false,message:"data is not given"})
-     let bookId = req.params.bookId
-      if(!bookId)return res.status(400).send({status:400,message:"bookid is not given by the user"})
+      let bookId = req.params.bookId
+      let requestBody=req.body
+      let queryParams = req.query
+      
+      //  query params should be empty
+    if (isValidRequestBody(queryParams)) {
+      return res
+        .status(400)
+        .send({ status: false, message: "invalid request" });
+    }
+
+    if (!isValidRequestBody(requestBody)) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Book data is required to update a new Book" });
+    }
+    //const decodedToken = req.decodedToken
+    //  let requestBody=req.body
+    //   if(!requestBody)return res.status(400).send({status:false,message:"data is not given"})
+    //  let bookId = req.params.bookId
+    //   if(!bookId)return res.status(400).send({status:400,message:"bookid is not given by the user"})
      
-      const decodedToken = req.decodedToken;
-  
+      
       let {title,excerpt,releasedAt,ISBN} = requestBody
       const isTitleUnique = await BookModel.findOne({
         title: title,
         isDeleted: false
       });
-      
-  
-      if (isTitleUnique) {
+        if(title)
+        {if (!isValid(title)) {
+          return res
+            .status(400)
+            .send({ status: false, message: `title is required and should be in valid format` });
+        }
+        if (isTitleUnique) {
         return res
           .status(400)
           .send({ status: false, message: `title already exist` });
-      }
+      }}
+    
       if (ISBN) {
       if (!isValid(ISBN)) {
         return res
@@ -294,7 +315,7 @@ const updateBooks= async function (req,res){
       }
   
       // checking ISBN format
-      if (!/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/
+      if (!/^(?=(?:\D*\d){13}(?:(?:\D*\d){3})?$)[\d-]+$/
   .test(ISBN)) {
         return res
           .status(400)
@@ -342,6 +363,8 @@ const deleteBookById = async function (req, res) {
       res.status(500).send({ status: false, message: error.message });
     }
   };
+
+
 module.exports.createBook = createBook;
 module.exports.getBooks = getBooks
 module.exports.getBooksById = getBooksById
