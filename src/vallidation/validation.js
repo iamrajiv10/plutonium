@@ -24,8 +24,7 @@ const isValidPhone = function (phone) {
 const isNameValid = function (value) {
     let regex = /^[a-zA-Z]+([\s][a-zA-Z]+)*$/
     return regex.test(value)
-}
-
+};
 
 
 

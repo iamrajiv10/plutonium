@@ -2,12 +2,32 @@ const mongoose = require('mongoose');
 const BookModel = require('../Model/bookModel')
 const reviewModel = require('../Model/reviewModel')
 const moment = require("moment")
+const Validator = require('../vallidation/validation')
 
 const isValid = function (value) {
     if (typeof (value) === undefined || typeof (value) === null) { return false }
     if (typeof (value) === "string" && (value).trim().length > 0) { return true }
     if (typeof (value) === "number" && (value).toString().length > 0) { return true }
 }
+
+const isValidReqBody= function(requestBody){
+    return Object.keys(requestBody).length<0;
+};
+
+const isValidObjectId = function (objectId) {
+    return mongoose.Types.ObjectId.isValid(objectId);
+};
+
+
+const isValidString = function (value) {
+    if (typeof value === "string" && value.trim().length === 0) return false;
+    return true;
+};
+
+
+
+
+
 
 const createReview = async function (req, res) {
     try {
@@ -72,4 +92,81 @@ const createReview = async function (req, res) {
       return res.status(500).send({ status: false, message: err.message });
     }
   };
-  module.exports.createReview = createReview;      
+
+  ///---------------------------------------------UPDATE Review---------------------------------------------///////
+  const updateReviews = async function (req, res) {
+    try {
+      let bookId = req.params.bookId;
+      let reviewId= req.params.reviewId
+      let requestBody = req.body;
+      const { review, rating, reviewedBy, reviewedAt } = requestBody;
+  
+       if (bookId){ 
+      if (!isValidReqBody(bookId)) {
+        return res.status(400).send({status: false, message: "Invalid request parameters. Please provide query details"});
+      }
+              
+      if (!isValidObjectId(bookId)) {
+        return res.status(400).send({ status: false, message: `bookId is missing.` });
+      }
+      if (!isValidObjectId(reviewId)) {
+        return res.status(400).send({ status: false, message: `reviewId is missing.` });
+      }
+  
+      if (!isValidString(review)) {
+        return res.status(400).send({ status: false, message: "Review is required for updatation." });
+      }
+  
+  
+      if (!(rating == 1 || rating == 2 || rating == 3 || rating == 4 || rating == 5)) {
+        return res.status(400).send({ status: false, message: ' please provide rating between 1 to 5' })
+    }
+  
+     
+      if (!isValidString(reviewedBy)) {
+        return res.status(400).send({ status: false, message: "reviewedBy is required for updatation." });
+      }
+  
+  
+     let deletedBook = await bookModel.findOne({_id:bookId, isDeleted:true})
+  
+     if (deletedBook) {
+         return res.status(400).send({status:false, msg: "Book has already been deleted."})
+     }
+     
+     let reviewById= await reviewModel.findOne({_id: reviewId, isDeleted:true})
+  
+     if (reviewById) {
+        return res.status(400).send({status:false, msg: "Review has already been deleted."})
+     }
+  
+     let isReviewId= await reviewModel.findById({_id: reviewId})
+  
+     if (bookId != isReviewId.bookId) {
+        return res.status(400).send({status:false, msg: "This review not belongs to this particular book."})
+     }
+  
+  
+     const updatedTheReview = await reviewModel.findOneAndUpdate(
+        { _id: req.params.reviewId },
+        {
+            review: review,
+            rating: rating,
+            reviewedBy: reviewedBy,
+             reviewedAt: Date.now()//check this in review api why we use $set
+         
+        },
+        { new: true }
+      );
+  
+      return res.status(200).send({status: true,message: "Successfully updated review details",data: updatedTheReview});
+       }      
+    } catch (err) {
+        console.log(err)
+      res.status(500).send({status: false,Error: err.message, });
+    }
+  };
+
+
+  module.exports.createReview = createReview;
+  module.exports.updateReviews = updateReviews;      
