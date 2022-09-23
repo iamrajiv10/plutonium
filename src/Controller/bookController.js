@@ -101,7 +101,7 @@ const createBook = async function (req, res) {
     }
 
     // authorization
-    if (decodedToken.userId != requestBody.userId) {
+    if (decoded.userId != requestBody.userId) {
       return res
         .status(401)
         .send({ status: false, message: `unauthorized access` });

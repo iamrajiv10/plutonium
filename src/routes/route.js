@@ -4,16 +4,25 @@ const bookController = require("../Controller/bookController");
 const userController = require("../Controller/userController");
 const reviewController = require("../Controller/reviewController");
 const validation = require("../vallidation/validation")
-const MiddleWare = require('../middleware/auth')
+const {authentication,authorization} = require('../middleware/auth')
 
 router.post("/register", validation.userValidation, userController.createUser)
 router.post("/login", userController.login)
-router.post('/books', MiddleWare.authentication ,bookController.createBook )
-router.get("/books", MiddleWare.authentication, bookController.getBooks)
+router.post('/books', authentication ,bookController.createBook )
+router.get("/books", authentication, bookController.getBooks)
 router.get("/books/:bookId",bookController.getBooksById)
-router.put("/books/:bookId",MiddleWare.authentication,MiddleWare.authorization,bookController.updateBooks)
-router.delete("/books/:bookId",MiddleWare.authentication, MiddleWare.authorization, bookController.deleteBookById)
+router.put("/books/:bookId",authentication,authorization,bookController.updateBooks)
+router.delete("/books/:bookId",authentication, authorization, bookController.deleteBookById)
 router.post("/books/:bookId/review", reviewController.createReview)
 router.put("/books/:bookId/review/:reviewId",reviewController.updateReviews)
+router.delete("/books/:bookId/review/:reviewId", reviewController.delReview)
+
+//API for wrong route-Of-API
+router.all("/**", function (req, res) {
+    res.status(404).send({
+        status: false,
+        message: "The api you request is not available"
+    })
+})
 
 module.exports = router;
