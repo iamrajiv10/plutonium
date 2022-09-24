@@ -13,7 +13,7 @@ const moment = require("moment")
 const isValidNumber = function(value)
 {
     if (typeof (value) === undefined || typeof (value) === null) { return false }
-    if (typeof (value) === "number" && (value).toString().length > 0) { return true }
+    if (typeof (value) === "number" && (value).length > 0) { return true }
 }
 
 const isValidReqBody = function (requestBody) {
@@ -47,7 +47,7 @@ const createReview = async function (req, res) {
 
         let { review, rating, reviewedBy, reviewedAt } = data
 
-        if (!isValidReqBody(data)) { return res.status(400).send({ status: false, message: "please provide data in request body" }) }
+        if (isValidReqBody(data)) { return res.status(400).send({ status: false, message: "please provide data in request body" }) }
         if(reviewedBy) {if (!isValidString(reviewedBy)) { return res.status(400).send({ status: false, message: "reviewedBy should be string." }) }}
 
         let guestId = "Guest"
@@ -96,7 +96,7 @@ const updateReviews = async function (req, res) {
         let requestBody = req.body;
         const { review, rating, reviewedBy } = requestBody;
 
-        if (!isValidReqBody(requestBody)) { return res.status(400).send({ status: false, message: "please provide data in request body" }) }
+        if (isValidReqBody(requestBody)) { return res.status(400).send({ status: false, message: "please provide data in request body" }) }
 
         if (!isValidObjectId(bookId)) { return res.status(400).send({ status: false, message: `bookId is missing.` }) }
 
@@ -107,15 +107,15 @@ const updateReviews = async function (req, res) {
            if (!isValidString(review)) { return res.status(400).send({ status: false, message: `review should be string` }) }
         }
 
-        else if(reviewedBy && reviewedBy.trim().length == 0)
+         if(reviewedBy)
         {
             if (!isValidString(reviewedBy)) { return res.status(400).send({ status: false, message: "reviewedBy should be string." }) }
         }
           
-       else
+       if(rating)
           { 
            
-                if (!(rating >= 1 && rating <= 5) ) {
+                if (!(rating > 0 && rating < 5) ) {
                 return res.status(400).send({ status: false, message: ' please provide rating between 1 to 5' }) } 
                 if (!isValidNumber(rating)) { return res.status(400).send({ status: false, message: `rating should be number` }) }
          }
@@ -135,7 +135,6 @@ const updateReviews = async function (req, res) {
         if (bookId != isReviewId.bookId) { return res.status(400).send({ status: false, msg: "This review not belongs to this particular book." }) }
         
         const updatedTheReview = await reviewModel.findOneAndUpdate(
-            // {_id:reviewId},{$set:{reviewedBy:reviewedBy,rating:rating,review:review},},{new:true})
 
             { _id: req.params.reviewId },
             {

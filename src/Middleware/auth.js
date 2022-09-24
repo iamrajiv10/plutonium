@@ -69,7 +69,7 @@ const authorization = async function (req, res, next) {
                 .send({ status: false, message: `no book found by ${bookId}` });
         }
 
-        if (decodedToken.userId != bookByBookId.userId) {
+        if (decodedToken != bookByBookId.userId) {
             return res
                 .status(403)
                 .send({ status: false, message: `unauthorized access` });
