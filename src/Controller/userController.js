@@ -3,6 +3,11 @@ const jwt = require('jsonwebtoken')
 const moment = require('moment')
 
 
+const isValidRequestBody = function (object) {
+    return Object.keys(object).length > 0;
+};
+
+
 
 // ----------------------------------------------------- create User ----------------------------------------------------
 
@@ -26,8 +31,14 @@ const createUser = async function (req, res) {
 const login = async function (req, res) {
     try {
         const requestBody = req.body; // it consist email and password
-
-        if (!requestBody.email || !requestBody.password) { return res.status(400).send({ status: false, message: "Credentials missing" }) }
+        if (!isValidRequestBody(requestBody)) {
+            return res
+                .status(400)
+                .send({ status: false, message: "Provide Credentials for login" });
+        }
+        
+        if (!requestBody.email ) { return res.status(400).send({ status: false, message: "email is required for login" }) }
+        if (!requestBody.password ) { return res.status(400).send({ status: false, message: "password is required for login" }) }
 
 
         const user = await userModel.findOne(requestBody)

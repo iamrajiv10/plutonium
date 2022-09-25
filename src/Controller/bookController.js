@@ -34,7 +34,7 @@ const createBook = async function (req, res) {
 
     const requestBody = req.body;
     const queryParams = req.query;
-    const decodedToken = req.decodedToken;
+    const decoded = req.decoded;
 
     //  query params should be empty
     if (isValidRequestBody(queryParams)) { return res.status(400).send({ status: false, message: "invalid request" }) }

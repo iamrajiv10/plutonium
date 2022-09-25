@@ -13,8 +13,10 @@ const moment = require("moment")
 const isValidNumber = function(value)
 {
     if (typeof (value) === undefined || typeof (value) === null) { return false }
-    if (typeof (value) === "number" && (value).length > 0) { return true }
-}
+    if (typeof value == "Number" && value.trim().length > 0) return true;
+};
+
+
 
 const isValidReqBody = function (requestBody) {
     return Object.keys(requestBody).length < 0;
@@ -33,59 +35,64 @@ const isValidString = function (value) {
 //=====================================================Add Review to a Book======================================================
 
 
+
 const createReview = async function (req, res) {
-    try {
-        let bookId = req.params.bookId;
-        if (!bookId) { return res.status(400).send({ status: false, message: "please provide bookid" }) }
+  try {
+      let bookId = req.params.bookId;
+      if (!bookId) { return res.status(400).send({ status: false, message: "please provide bookid" }) }
 
-        if (!isValidObjectId(bookId)) { return res.status(400).send({ status: false, message: "Invalid bookId" }) }
+      if (!isValidObjectId(bookId)) { return res.status(400).send({ status: false, message: "Invalid bookId" }) }
 
-        let checkBookId = await BookModel.findById(bookId);
-        if (!checkBookId) { return res.status(400).send({ status: false, message: "No such bookId" }) }
+      let checkBookId = await BookModel.findById(bookId);
+      if (!checkBookId) { return res.status(400).send({ status: false, message: "No such bookId" }) }
 
-        let data = req.body
+      let data = req.body
 
-        let { review, rating, reviewedBy, reviewedAt } = data
+      let { review, rating, reviewedBy, reviewedAt } = data
 
-        if (isValidReqBody(data)) { return res.status(400).send({ status: false, message: "please provide data in request body" }) }
-        if(reviewedBy) {if (!isValidString(reviewedBy)) { return res.status(400).send({ status: false, message: "reviewedBy should be string." }) }}
+      if (isValidReqBody(data)) { return res.status(400).send({ status: false, message: "please provide data in request body" }) }
+      if(reviewedBy) {if (!isValidString(reviewedBy)) { return res.status(400).send({ status: false, message: "reviewedBy should be string." }) }}
 
-        let guestId = "Guest"
-        if (!isValidString(reviewedBy)) {
-            data['reviewedBy'] = guestId
+      let guestId = "Guest"
+      if (!isValidString(reviewedBy)) {
+          data['reviewedBy'] = guestId
+      }
+
+      if (!reviewedAt) { return res.status(400).send({ status: false, message: "please provide reviewedAt is required" }) }
+      if (!/^[0-9]{4}[-]{1}[0-9]{2}[-]{1}[0-9]{2}/.test(reviewedAt)) {
+          return res.status(400).send({ status: false, message: `reviewedAt date format should be YYYY-MM-DD` })
         }
 
-        if (!reviewedAt) { return res.status(400).send({ status: false, message: "please provide reviewedAt is required" }) }
-
+    
+      if (!rating) { return res.status(400).send({ status: false, message: "please provide rating" }) }
+      if (isValidNumber(rating)) { return res.status(400).send({ status: false, message: `rating should be number` }) }
+      if (!(rating >= 1 && rating <= 5) ) {
+          return res.status(400).send({ status: false, message: "give rating 1 to 5 " })
+      }
       
-        //if (!rating) { return res.status(400).send({ status: false, message: "please provide rating" }) }
-        if (!(rating >= 1 && rating <= 5) ) {
-            return res.status(400).send({ status: false, message: "give rating 1 to 5 " })
-        }
-        if (!isValidNumber(rating)) { return res.status(400).send({ status: false, message: `rating should be number` }) }
 
-        if (!isValidString(review)) { return res.status(400).send({ status: false, message: `review should be string` })}
+      if (!isValidString(review)) { return res.status(400).send({ status: false, message: `review should be string` })}
 
-        if (checkBookId.isDeleted == true) { return res.status(400).send({ status: false, message: "Already book deleted then you can not add" }) }
+      if (checkBookId.isDeleted == true) { return res.status(400).send({ status: false, message: "Already book deleted then you can not add" }) }
 
-        let reviewData = await reviewModel.create({
-            bookId: bookId,
-            reviewedBy: reviewedBy ? reviewedBy : "Guest",
-            reviewedAt: moment(reviewedAt).toISOString(),
-            rating: rating,
-            review: review
-        })
+      let reviewData = await reviewModel.create({
+          bookId: bookId,
+          reviewedBy: reviewedBy ? reviewedBy : "Guest",
+          reviewedAt: moment(reviewedAt).toISOString(),
+          rating: rating,
+          review: review
+      })
 
-        if (reviewData) { await BookModel.findOneAndUpdate({ _id: bookId }, { $inc: { reviews: 1 } }) }
+      if (reviewData) { await BookModel.findOneAndUpdate({ _id: bookId }, { $inc: { reviews: 1 } }) }
 
-        let RD = await reviewModel.findOne({ _id: reviewData._id }).select({ _v: 0, createdAt: 0, updatedAt: 0, isDeleted: 0 })
+      let RD = await reviewModel.findOne({ _id: reviewData._id }).select({ _v: 0, createdAt: 0, updatedAt: 0, isDeleted: 0 })
 
-        res.status(201).send({ status: true, message: "review added", data: RD })
+      res.status(201).send({ status: true, message: "review added", data: RD })
 
-    }
-    catch (err) {
-        return res.status(500).send({ status: false, message: err.message });
-    }
+  }
+  catch (err) {
+      return res.status(500).send({ status: false, message: err.message });
+  }
 }
 
 ///---------------------------------------------UPDATE Review---------------------------------------------///////
@@ -98,9 +105,9 @@ const updateReviews = async function (req, res) {
 
         if (isValidReqBody(requestBody)) { return res.status(400).send({ status: false, message: "please provide data in request body" }) }
 
-        if (!isValidObjectId(bookId)) { return res.status(400).send({ status: false, message: `bookId is missing.` }) }
+        if (!isValidObjectId(bookId)) { return res.status(400).send({ status: false, message: `bookId is Invalid.` }) }
 
-        if (!isValidObjectId(reviewId)) { return res.status(400).send({ status: false, message: `reviewId is missing.` }) }
+        if (!isValidObjectId(reviewId)) { return res.status(400).send({ status: false, message: `reviewId is Invalid.` }) }
 
         if(review)
        {
@@ -112,13 +119,12 @@ const updateReviews = async function (req, res) {
             if (!isValidString(reviewedBy)) { return res.status(400).send({ status: false, message: "reviewedBy should be string." }) }
         }
           
-       if(rating)
-          { 
-           
-                if (!(rating > 0 && rating < 5) ) {
-                return res.status(400).send({ status: false, message: ' please provide rating between 1 to 5' }) } 
-                if (!isValidNumber(rating)) { return res.status(400).send({ status: false, message: `rating should be number` }) }
-         }
+       
+       if (!rating) { return res.status(400).send({ status: false, message: "please provide rating" }) }
+       if (isValidNumber(rating)) { return res.status(400).send({ status: false, message: `rating should be number` }) }
+       if (!(rating >= 1 && rating <= 5) ) {
+           return res.status(400).send({ status: false, message: "give rating 1 to 5 " })
+       }
         // if (!(rating >= 1 && rating <= 5) ) {
           //  return res.status(400).send({ status: false, message: ' please provide rating between 1 to 5' }) }
         

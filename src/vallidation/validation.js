@@ -109,7 +109,7 @@ const  userValidation = async function(req,res,next){
         if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,15})/.test(password)) {
             return res
                 .status(400)
-                .send({ status: false, message: "password should be: 8 to 15 characters " });
+                .send({ status: false, message: "Password must contain 8 to 15 characters and have at least one number, one unique character, one Capital letter and one small letter " });
         }
 
         if (address) {

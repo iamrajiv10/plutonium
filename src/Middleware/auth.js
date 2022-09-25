@@ -18,7 +18,7 @@ const authentication = async function (req, res, next) {
         if (!decoded) {
             return res.status(400).send({ status: false, message: "Invalid Authentication Token in request header" })
         }
-
+        req["decoded"]=decoded
         if (Date.now() > decoded.exp * 1000) {
            return res.status(440).send({ status: false, message: "session expired, please login again" })
         }
