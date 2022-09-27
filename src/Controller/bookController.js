@@ -63,7 +63,7 @@ const createBook = async function (req, res) {
     if (!isUserExistWithID) { return res.status(404).send({ status: false, message: `no user exist with ${userId}` }) }
 
     // authorization
-    if (decoded.userId != requestBody.userId) { return res.status(401).send({ status: false, message: `unauthorized access` }) }
+    if (decoded.userId != requestBody.userId) { return res.status(403).send({ status: false, message: `unauthorized access` }) }
 
     if (!isValid(ISBN)) { return res.status(400).send({ status: false, message: `ISBN is required` }) }
     // checking ISBN format

@@ -6,13 +6,17 @@ const reviewController = require("../Controller/reviewController");
 const validation = require("../vallidation/validation")
 const {authentication, authorization} = require('../middleware/auth')
 
+
 router.post("/register", validation.userValidation, userController.createUser)
 router.post("/login", userController.login)
+
 router.post('/books', authentication ,bookController.createBook )
 router.get("/books", authentication, bookController.getBooks)
 router.get("/books/:bookId", authentication, bookController.getBooksById)
 router.put("/books/:bookId",authentication, authorization,bookController.updateBooks)
 router.delete("/books/:bookId",authentication, authorization, bookController.deleteBookById)
+
+
 router.post("/books/:bookId/review", reviewController.createReview)
 router.put("/books/:bookId/review/:reviewId",reviewController.updateReviews)
 router.delete("/books/:bookId/review/:reviewId", reviewController.delReview)
